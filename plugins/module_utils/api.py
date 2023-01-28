@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
-from functools import cached_property
 __metaclass__ = type
 
 from ansible.module_utils.urls import Request
@@ -13,10 +12,7 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 
 import json
-
-
-class KeycloakError(Exception):
-    pass
+from functools import cached_property
 
 
 class KeycloakApi(object):
@@ -38,7 +34,7 @@ class KeycloakApi(object):
     def post(self, url, payload):
         url = f"{self.module.params['keycloak_url']}/{ url }"
         try:
-            data = self._cli.post(url,data=json.dumps(payload)).read()
+            data = self._cli.post(url, data=json.dumps(payload)).read()
             if data:
                 return json.loads(data)
             return None
@@ -53,7 +49,7 @@ class KeycloakApi(object):
     def put(self, url, payload):
         url = f"{self.module.params['keycloak_url']}/{ url }"
         try:
-            data = self._cli.put(url,data=json.dumps(payload)).read()
+            data = self._cli.put(url, data=json.dumps(payload)).read()
             if data:
                 return json.loads(data)
             return None
@@ -72,7 +68,7 @@ class KeycloakApi(object):
             validate_certs=self.module.params.get('validate_certs'),
             http_agent=f"Ansible-{self.module.ansible_version}/{self.module._name}"
         )
-        
+
         payload = {
             'grant_type': 'password',
             'client_id': self.module.params.get('keycloak_client_id'),
@@ -94,6 +90,6 @@ class KeycloakApi(object):
         cli.headers.update({
             'Authorization': f"Bearer {data['access_token']}",
             'Content-Type': 'application/json'
-        })        
+        })
 
         return cli

@@ -1,0 +1,50 @@
+- name: Check if Docker is available
+  community.docker.docker_host_info:
+  ignore_errors: true
+  register: docker
+
+- name: Recreate Keycloak Docker container
+  community.docker.docker_container:
+    name: scsitteam_keycloak_integration_test
+    image: "quay.io/keycloak/keycloak:20.0.3"
+    command: ["start-dev"]
+    state: started
+    recreate: true
+    published_ports:
+      - 8080
+    env:
+      KEYCLOAK_ADMIN=admin
+      KEYCLOAK_ADMIN_PASSWORD=admin
+  register: keycloak
+  notify: Clean up docker container
+  when: docker is not failed
+
+- name: Recreate Keycloak Podman container
+  containers.podman.podman_container:
+    name: scsitteam_keycloak_integration_test
+    image: "quay.io/keycloak/keycloak:20.0.3"
+    command: ["start-dev"]
+    state: started
+    recreate: true
+    published_ports:
+      - 8080
+    env:
+      KEYCLOAK_ADMIN=admin
+      KEYCLOAK_ADMIN_PASSWORD=admin
+  register: keycloak
+  notify: Clean up podman container
+  when: docker is failed
+
+- name: Set keycloak url facts
+  ansible.builtin.set_fact:
+    keycloak_url: "http://localhost:{{ keycloak.container.NetworkSettings.Ports['8080/tcp'][0].HostPort }}"
+
+- name: Wait for keycloak to serve HTTP requests
+  ansible.builtin.uri:
+    url: "{{ keycloak_url }}"
+    return_content: yes
+  register: http
+  until: "http is not failed"
+  retries: 10
+  delay: 10
+ 

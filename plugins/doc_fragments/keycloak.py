@@ -18,8 +18,6 @@ options:
             - URL to the Keycloak instance.
         type: str
         required: true
-        aliases:
-          - url
 
     keycloak_client_id:
         description:
@@ -31,6 +29,7 @@ options:
         description:
             - Keycloak realm name to authenticate to for API access.
         type: str
+        default: master
 
     keycloak_client_secret:
         description:

@@ -1,0 +1,9 @@
+- name: Clean up docker container
+  community.docker.docker_container:
+    name: scsitteam_keycloak_integration_test
+    state: absent
+
+- name: Clean up podman container
+  containers.podman.podman_container:
+    name: scsitteam_keycloak_integration_test
+    state: absent

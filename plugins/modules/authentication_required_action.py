@@ -75,13 +75,14 @@ password_policy:
     {
       "length": "8",
       "lowerCase": "1",
-      "upperCase": "1"
+      "upperCase": "1",
       "digits": "1",
       "specialChars": "1",
     }
 '''
 
 from ansible_collections.scsitteam.keycloak.plugins.module_utils.module import AnsibleKeycloakModule
+
 
 def main():
     """
@@ -97,7 +98,7 @@ def main():
     )
 
     module = AnsibleKeycloakModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+                                   supports_check_mode=True)
 
     result = dict(changed=False)
 
@@ -110,18 +111,18 @@ def main():
 
     # Get current state
     required_actions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/required-actions")
-    current_required_action = next(filter(lambda a: a['name']== name, required_actions), None)
+    current_required_action = next(filter(lambda a: a['name'] == name, required_actions), None)
 
     # Register if unregisterd
     if not current_required_action:
         unreg_required_actions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/unregistered-required-actions")
-        current_required_action = next(filter(lambda a: a['name']== name, unreg_required_actions), None)
+        current_required_action = next(filter(lambda a: a['name'] == name, unreg_required_actions), None)
 
         if current_required_action and not module.check_mode:
             module.api.post(f"/admin/realms/{ keycloak_realm }/authentication/register-required-action", payload=current_required_action)
-    
+
             required_actions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/required-actions")
-            current_required_action = next(filter(lambda a: a['name']== name, required_actions), None)
+            current_required_action = next(filter(lambda a: a['name'] == name, required_actions), None)
 
     if not current_required_action:
         module.fail_json(f"requied action with name '{name}' not found")
@@ -137,15 +138,16 @@ def main():
 
     if current_required_action == new_required_action:
         module.exit_json(required_action=current_required_action, **result)
-    
+
     result['changed'] = True
     if module._diff:
         result['diff'] = dict(before=current_required_action, after=new_required_action)
-       
+
     if not module.check_mode:
         module.api.put(f"/admin/realms/{ keycloak_realm }/authentication/required-actions/{current_required_action['providerId']}", payload=new_required_action)
 
     module.exit_json(required_action=new_required_action, **result)
+
 
 if __name__ == '__main__':
     main()

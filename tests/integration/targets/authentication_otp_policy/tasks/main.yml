@@ -1,0 +1,54 @@
+# Test code for the authentication_otp_policy module.
+# Copyright: (c) 2023, Marius Rieder <marius.rieder@scs.ch>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: Reset to 6 Digit TOTP
+  authentication_otp_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    type: totp
+    digits: 6
+
+- name: Set to 8 Digit Counter OTP (check_mode)
+  authentication_otp_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    type: hotp
+    digits: 8
+  check_mode: true
+  register: result_0001
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result_0001.changed == true }}"
+
+- name: Set to 8 Digit Counter OTP
+  authentication_otp_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    type: hotp
+    digits: 8
+  register: result_0002
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result_0002.changed == true }}"
+
+- name: Set to 8 Digit Counter OTP (again)
+  authentication_otp_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    type: hotp
+    digits: 8
+  register: result_0003
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result_0003.changed == false }}"

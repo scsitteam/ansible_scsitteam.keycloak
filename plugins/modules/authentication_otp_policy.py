@@ -20,7 +20,7 @@ description:
 
 options:
     type:
-        description: 
+        description:
             - OTP Type, time or counter based OTP.
             - On C(totp) time based OTP is used.
             - On C(hotp) counter based OTP is used.
@@ -53,7 +53,6 @@ options:
     initial_counter:
         description: Counter to start C(hotp) counter at. Must be between 1 and 120.
         type: int
-    
 
 extends_documentation_fragment:
 - scsitteam.keycloak.keycloak
@@ -93,6 +92,7 @@ required_action:
 
 from ansible_collections.scsitteam.keycloak.plugins.module_utils.module import AnsibleKeycloakModule
 
+
 def main():
     """
     Module execution
@@ -110,7 +110,7 @@ def main():
     )
 
     module = AnsibleKeycloakModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+                                   supports_check_mode=True)
 
     if module.params.get('initial_counter') is not None:
         initial_counter = module.params.get('initial_counter')
@@ -123,7 +123,7 @@ def main():
 
     # Get current otp policy
     data = module.api.get(f"/admin/realms/{ keycloak_realm }")
-    current_otp_policy = {k: v for k,v in data.items() if k.startswith('otpPolicy')}
+    current_otp_policy = {k: v for k, v in data.items() if k.startswith('otpPolicy')}
 
     # Build new otp policy
     new_opt_policy = current_otp_policy.copy()
@@ -148,11 +148,12 @@ def main():
     result['changed'] = True
     if module._diff:
         result['diff'] = dict(before=current_otp_policy, after=new_opt_policy)
-       
+
     if not module.check_mode:
         module.api.put(f"/admin/realms/{ keycloak_realm }", payload=new_opt_policy)
 
     module.exit_json(otp_policy=new_opt_policy, **result)
+
 
 if __name__ == '__main__':
     main()

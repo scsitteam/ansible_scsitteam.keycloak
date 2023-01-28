@@ -29,11 +29,11 @@ options:
     state:
         description:
             - State of the password policy
-            - On C(presend), the give policies will be enabled and configured.
+            - On C(present), the give policies will be enabled and configured.
             - On C(absent), the give policies will be deactivated.
             - On C(pure), the give policies will be enabled and configured. All other policies will be deactivated.
-        choices: ['presend', 'absent', 'pure']
-        default: 'presend'
+        choices: ['present', 'absent', 'pure']
+        default: 'present'
         type: str
 
 extends_documentation_fragment:
@@ -47,7 +47,7 @@ EXAMPLES = r'''
   scsitteam.kaycloak.authentication_password_policy:
     state: present
     policy:
-      digites: 1
+      digits: 1
 
 - name: Do not Require lower case characters
   scsitteam.kaycloak.authentication_password_policy:
@@ -82,6 +82,7 @@ required_action:
 
 from ansible_collections.scsitteam.keycloak.plugins.module_utils.module import AnsibleKeycloakModule
 
+
 def main():
     """
     Module execution
@@ -94,17 +95,17 @@ def main():
     )
 
     module = AnsibleKeycloakModule(argument_spec=argument_spec,
-                           supports_check_mode=True)
+                                   supports_check_mode=True)
 
     result = dict(changed=False)
 
     keycloak_realm = module.params.get('keycloak_realm')
-    policy = {k: str(v) for k,v in module.params.get('policy').items()}
+    policy = {k: str(v) for k, v in module.params.get('policy').items()}
     state = module.params.get('state')
 
     # Get current password policy
     data = module.api.get(f"/admin/realms/{ keycloak_realm }")
-    current_password_policy = dict(p[:-1].split('(', 1) for p in data.get('passwordPolicy', '').split(' and '))
+    current_password_policy = dict(p[:-1].split('(', 1) for p in data.get('passwordPolicy', '').split(' and ') if p)
 
     new_password_policy = current_password_policy.copy()
 
@@ -123,13 +124,14 @@ def main():
     result['changed'] = True
     if module._diff:
         result['diff'] = dict(before=current_password_policy, after=new_password_policy)
-       
+
     if not module.check_mode:
         module.api.put(f"/admin/realms/{ keycloak_realm }", payload=dict(
-            passwordPolicy=" and ".join(f"{k}({v})" for k,v in new_password_policy.items())
+            passwordPolicy=" and ".join(f"{k}({v})" for k, v in new_password_policy.items())
         ))
 
     module.exit_json(password_policy=new_password_policy, **result)
+
 
 if __name__ == '__main__':
     main()

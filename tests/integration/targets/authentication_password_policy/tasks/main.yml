@@ -1,0 +1,161 @@
+# Test code for the authentication_otp_policy module.
+# Copyright: (c) 2023, Marius Rieder <marius.rieder@scs.ch>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+
+- name: Require at lease one digit (check_mode)
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: present
+    policy:
+      digits: 1
+  check_mode: true
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == true }}"
+
+- name: Require at lease one digit
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: present
+    policy:
+      digits: 1
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == true }}"
+
+- name: Require at lease one digit (again)
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: present
+    policy:
+      digits: 1
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == false }}"
+
+- name: Require at lease two digit
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: present
+    policy:
+      digits: 2
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == true }}"
+
+- name: Remove policy named alice
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: absent
+    policy:
+      alice: bob
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == false }}"
+
+- name: Remove policy named digits
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: absent
+    policy:
+      digits: 2
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == true }}"
+
+- name: Remove policy named digits (again)
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: absent
+    policy:
+      digits: 2
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == false }}"
+
+- name: Set complete Policy
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: pure
+    policy:
+      digits: 1
+      lowerCase: 1
+      upperCase: 1
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == true }}"
+
+- name: Set complete Policy (again)
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: pure
+    policy:
+      digits: 1
+      lowerCase: 1
+      upperCase: 1
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == false }}"
+
+- name: Set different Policy
+  authentication_password_policy:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    state: pure
+    policy:
+      digits: 1
+      lowerCase: 2
+      specialChars: 1
+  register: result
+
+- name: ensure cluster is present
+  assert:
+    that:
+        - "{{ result.changed == true }}"
