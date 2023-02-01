@@ -61,6 +61,21 @@ class KeycloakApi(object):
         except Exception as e:
             self.module.fail_json(f"Could not put {url}: {str(e)}")
 
+    def delete(self, url):
+        url = f"{self.module.params['keycloak_url']}/{ url }"
+        try:
+            data = self._cli.delete(url).read()
+            if data:
+                return json.loads(data)
+            return None
+        except HTTPError as e:
+            data = json.loads(e.read())
+            self.module.fail_json(f"Could not delete {url}: {data}")
+        except json.JSONDecodeError as e:
+            self.module.fail_json(f"API returned invalid JSON when trying to delete {url}: {str(e)}")
+        except Exception as e:
+            self.module.fail_json(f"Could not delete {url}: {str(e)}")
+
     @cached_property
     def _cli(self):
         cli = Request(

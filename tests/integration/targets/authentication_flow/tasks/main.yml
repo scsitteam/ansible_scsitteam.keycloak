@@ -1,0 +1,240 @@
+# Test code for the authentication_otp_policy module.
+# Copyright: (c) 2023, Marius Rieder <marius.rieder@scs.ch>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- &FLOW_CREATE
+  name: Create new flow (check_mode)
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: test-flow
+    description: Test Flow
+    type: basic
+  check_mode: true
+  register: result
+
+- &ENSURE_CHANGED
+  name: ensure changed
+  assert:
+    that:
+        - "{{ result.changed == true }}"
+
+- <<: *FLOW_CREATE
+  name: Create new flow
+  check_mode: false
+
+- <<: *ENSURE_CHANGED
+
+- <<: *FLOW_CREATE
+  name: Create new flow (again)
+  check_mode: false
+
+- &ENSURE_NOT_CHANGED
+  name: ensure not changed
+  assert:
+    that:
+        - "{{ result.changed == false }}"
+
+- &FLOW_UPDATE
+  name: Create new flow (check_mode)
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: test-flow
+    description: Test Flow New
+  check_mode: true
+  register: result
+
+- <<: *ENSURE_CHANGED
+
+- <<: *FLOW_UPDATE
+  name: Change Flow Description
+  check_mode: false
+
+- <<: *ENSURE_CHANGED
+
+- <<: *FLOW_UPDATE
+  name: Change Flow Description (again)
+  check_mode: false
+
+- <<: *ENSURE_NOT_CHANGED
+
+
+- &EXECUTION_SET1
+  name: Set Executions 1 (check_mode)
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: test-flow
+    executions:
+      - authenticator: identity-provider-redirector
+        requirement: ALTERNATIVE
+  check_mode: true
+  register: result
+
+- <<: *ENSURE_CHANGED
+
+- <<: *EXECUTION_SET1
+  name: Set Executions 1
+  check_mode: false
+
+- <<: *ENSURE_CHANGED
+
+- <<: *EXECUTION_SET1
+  name: Set Executions 1 (again)
+  check_mode: false
+
+- <<: *ENSURE_NOT_CHANGED
+
+
+- &EXECUTION_SET2
+  name: Set Executions 2 (check_mode)
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: test-flow
+    executions:
+      - authenticator: auth-cookie
+        requirement: ALTERNATIVE
+      - authenticator: auth-spnego
+        requirement: DISABLED
+      - authenticator: identity-provider-redirector
+        requirement: ALTERNATIVE
+
+      - name: test-flow 2 forms
+        description: Username, password, otp and other auth forms.
+        requirement: ALTERNATIVE
+        executions:
+          - authenticator: auth-username-password-form
+            requirement: REQUIRED
+
+          - name: test-flow 2 Browser - Conditional OTP
+            description: Flow to determine if the OTP is required for the authentication
+            requirement: CONDITIONAL
+            executions:
+              - authenticator: conditional-user-configured
+                requirement: REQUIRED
+
+              - authenticator: auth-otp-form
+                requirement: REQUIRED
+  check_mode: true
+  register: result
+
+- <<: *ENSURE_CHANGED
+
+- <<: *EXECUTION_SET2
+  name: Set Executions 2
+  check_mode: false
+
+- <<: *ENSURE_CHANGED
+
+- <<: *EXECUTION_SET2
+  name: Set Executions 2 (again)
+  check_mode: false
+
+- <<: *ENSURE_NOT_CHANGED
+
+
+- &EXECUTION_SET3
+  name: Set Executions 3 (check_mode)
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: test-flow
+    executions:
+      - name: test-flow 3 registration form
+        description: registration form
+        requirement: REQUIRED
+        type: form
+        executions:
+          - authenticator: registration-user-creation
+            requirement: "REQUIRED"
+          - authenticator: registration-profile-action
+            requirement: "REQUIRED"
+          - authenticator: registration-password-action
+            requirement: "REQUIRED"
+          - authenticator: registration-recaptcha-action
+            requirement: "DISABLED"
+  check_mode: true
+  register: result
+
+- <<: *ENSURE_CHANGED
+
+- <<: *EXECUTION_SET3
+  name: Set Executions 3
+  check_mode: false
+
+- <<: *ENSURE_CHANGED
+
+- <<: *EXECUTION_SET3
+  name: Set Executions 3 (again)
+  check_mode: false
+
+- <<: *ENSURE_NOT_CHANGED
+
+
+- &FLOW_BIND
+  name: Bind Flow to resetCredentials (check_mode)
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: test-flow
+    bind: resetCredentials
+  check_mode: true
+  register: result
+
+- <<: *ENSURE_CHANGED
+
+- <<: *FLOW_BIND
+  name: Bind Flow to resetCredentials
+  check_mode: false
+
+- <<: *ENSURE_CHANGED
+
+- <<: *FLOW_BIND
+  name: Bind Flow to resetCredentials (again)
+  check_mode: false
+
+- <<: *ENSURE_NOT_CHANGED
+
+
+- name: Bind 'reset credentials' Flow to resetCredentials
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: reset credentials
+    bind: resetCredentials
+  register: result
+
+
+- &FLOW_DELETE
+  name: Delete Flow (check_mode)
+  authentication_flow:
+    keycloak_url: '{{ keycloak_url }}'
+    keycloak_username: admin
+    keycloak_password: admin
+    name: test-flow
+    state: absent
+  check_mode: true
+  register: result
+
+- <<: *ENSURE_CHANGED
+
+- <<: *FLOW_DELETE
+  name: Delete Flow
+  check_mode: false
+
+- <<: *ENSURE_CHANGED
+
+- <<: *FLOW_DELETE
+  name: Delete Flow (again)
+  check_mode: false
+
+- <<: *ENSURE_NOT_CHANGED
