@@ -7,7 +7,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: present
     policy:
       digits: 1
@@ -23,7 +23,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: present
     policy:
       digits: 1
@@ -38,7 +38,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: present
     policy:
       digits: 1
@@ -53,7 +53,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: present
     policy:
       digits: 2
@@ -68,7 +68,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: absent
     policy:
       alice: bob
@@ -83,7 +83,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: absent
     policy:
       digits: 2
@@ -98,7 +98,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: absent
     policy:
       digits: 2
@@ -113,7 +113,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: pure
     policy:
       digits: 1
@@ -130,7 +130,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: pure
     policy:
       digits: 1
@@ -147,7 +147,7 @@
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     state: pure
     policy:
       digits: 1

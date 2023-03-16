@@ -20,6 +20,10 @@ options:
         aliases: [ keycloak_auth_url ]
         required: true
 
+    realm:
+        description: Realm to operate on. Default to the auth_realm option.
+        type: str
+
     auth_client_id:
         description:
             - OpenID Connect I(client_id) to authenticate to the API with.
@@ -52,7 +56,7 @@ options:
         type: str
         aliases: [ keycloak_password ]
 
-    keycloak_auth_token:
+    auth_token:
         description:
             - Authentication token for Keycloak API.
         type: str

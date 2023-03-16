@@ -19,9 +19,6 @@ description:
       to your needs and a user having the expected roles.
 
 options:
-    realm:
-        description: Realm to operate on. Default to the auth_realm option.
-        type: str
     policy:
         description:
             - Policies to manage as a dictionary with the policy name as keys and the policy config as value.
@@ -93,7 +90,6 @@ def main():
     :return:
     """
     argument_spec = dict(
-        realm=dict(type='str'),
         policy=dict(type='dict'),
         state=dict(type='str', default='present', choices=['present', 'absent', 'pure']),
     )
@@ -108,7 +104,7 @@ def main():
     state = module.params.get('state')
 
     # Get current password policy
-    data = module.api.get(f"/admin/realms/{ realm }")
+    data = module.api.get("/")
     current_password_policy = dict(p[:-1].split('(', 1) for p in data.get('passwordPolicy', '').split(' and ') if p)
 
     new_password_policy = current_password_policy.copy()
@@ -130,7 +126,7 @@ def main():
         result['diff'] = dict(before=current_password_policy, after=new_password_policy)
 
     if not module.check_mode:
-        module.api.put(f"/admin/realms/{ realm }", payload=dict(
+        module.api.put("/", payload=dict(
             passwordPolicy=" and ".join(f"{k}({v})" for k, v in new_password_policy.items())
         ))
 

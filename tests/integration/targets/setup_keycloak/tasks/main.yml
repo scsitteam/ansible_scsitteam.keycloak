@@ -14,7 +14,7 @@
       - 8080
     env:
       KEYCLOAK_ADMIN=admin
-      KEYCLOAK_ADMIN_PASSWORD=admin
+      KEYCLOAK_ADMIN_PASSWORD=password
   register: keycloak
   notify: Clean up docker container
   when: docker is not failed
@@ -30,7 +30,7 @@
       - 8080
     env:
       KEYCLOAK_ADMIN=admin
-      KEYCLOAK_ADMIN_PASSWORD=admin
+      KEYCLOAK_ADMIN_PASSWORD=password
   register: keycloak
   notify: Clean up podman container
   when: docker is failed

@@ -19,9 +19,6 @@ description:
       to your needs and a user having the expected roles.
 
 options:
-    realm:
-        description: Realm to operate on. Default to the auth_realm option.
-        type: str
     name:
         description: Name of the required action to manage
         required: true
@@ -94,7 +91,6 @@ def main():
     :return:
     """
     argument_spec = dict(
-        realm=dict(type='str'),
         name=dict(type='str', required=True),
         priority=dict(type='int'),
         state=dict(type='str', default='enabled', choices=['enabled', 'disabled']),
@@ -114,18 +110,18 @@ def main():
     default_action = module.params.get('default_action')
 
     # Get current state
-    required_actions = module.api.get(f"/admin/realms/{ realm }/authentication/required-actions")
+    required_actions = module.api.get("/authentication/required-actions")
     current_required_action = next(filter(lambda a: a['name'] == name, required_actions), None)
 
     # Register if unregisterd
     if not current_required_action:
-        unreg_required_actions = module.api.get(f"/admin/realms/{ realm }/authentication/unregistered-required-actions")
+        unreg_required_actions = module.api.get("/authentication/unregistered-required-actions")
         current_required_action = next(filter(lambda a: a['name'] == name, unreg_required_actions), None)
 
         if current_required_action and not module.check_mode:
-            module.api.post(f"/admin/realms/{ realm }/authentication/register-required-action", payload=current_required_action)
+            module.api.post("/authentication/register-required-action", payload=current_required_action)
 
-            required_actions = module.api.get(f"/admin/realms/{ realm }/authentication/required-actions")
+            required_actions = module.api.get("/authentication/required-actions")
             current_required_action = next(filter(lambda a: a['name'] == name, required_actions), None)
 
     if not current_required_action:
@@ -148,7 +144,7 @@ def main():
         result['diff'] = dict(before=current_required_action, after=new_required_action)
 
     if not module.check_mode:
-        module.api.put(f"/admin/realms/{ realm }/authentication/required-actions/{current_required_action['providerId']}", payload=new_required_action)
+        module.api.put(f"/authentication/required-actions/{current_required_action['providerId']}", payload=new_required_action)
 
     module.exit_json(required_action=new_required_action, **result)
 

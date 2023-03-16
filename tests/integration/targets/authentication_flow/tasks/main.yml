@@ -7,7 +7,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: test-flow
     description: Test Flow
     type: basic
@@ -41,7 +41,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: test-flow
     description: Test Flow New
   check_mode: true
@@ -67,7 +67,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: test-flow
     executions:
       - authenticator: identity-provider-redirector
@@ -95,7 +95,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: test-flow
     executions:
       - authenticator: auth-cookie
@@ -144,7 +144,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: test-flow
     executions:
       - name: test-flow 3 registration form
@@ -183,7 +183,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: test-flow
     bind: resetCredentials
   check_mode: true
@@ -208,7 +208,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: reset credentials
     bind: resetCredentials
   register: result
@@ -219,7 +219,7 @@
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
     auth_username: admin
-    auth_password: admin
+    auth_password: password
     name: test-flow
     state: absent
   check_mode: true

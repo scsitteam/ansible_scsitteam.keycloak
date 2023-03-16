@@ -20,7 +20,7 @@ class KeycloakApi(object):
         self.module = module
 
     def get(self, url):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             return json.loads(self._cli.get(url).read())
         except HTTPError as e:
@@ -32,7 +32,7 @@ class KeycloakApi(object):
             self.module.fail_json(f"Could not get {url}: {str(e)}")
 
     def post(self, url, payload):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             data = self._cli.post(url, data=json.dumps(payload)).read()
             if data:
@@ -47,7 +47,7 @@ class KeycloakApi(object):
             self.module.fail_json(f"Could not post {url}: {str(e)}")
 
     def put(self, url, payload):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             data = self._cli.put(url, data=json.dumps(payload)).read()
             if data:
@@ -62,7 +62,7 @@ class KeycloakApi(object):
             self.module.fail_json(f"Could not put {url}: {str(e)}")
 
     def delete(self, url):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             data = self._cli.delete(url).read()
             if data:

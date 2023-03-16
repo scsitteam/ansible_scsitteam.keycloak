@@ -19,9 +19,6 @@ description:
       to your needs and a user having the expected roles.
 
 options:
-    realm:
-        description: Realm to operate on. Default to the auth_realm option.
-        type: str
     name:
         description: Name of the group to (un)assigne roles to
         required: true
@@ -107,7 +104,6 @@ def main():
     :return:
     """
     argument_spec = dict(
-        realm=dict(type='str'),
         name=dict(type='str', required=True),
         state=dict(type='str', default='present', choices=['present', 'absent', 'pure']),
         role=dict(type='str'),
@@ -139,14 +135,14 @@ def main():
         roles = [role]
 
     # Get group
-    groups = module.api.get(f"/admin/realms/{ realm }/groups?search={ name }&exact=true")
+    groups = module.api.get(f"/groups?search={ name }&exact=true")
     if len(groups) != 1:
         module.fail_json(f"Group '{name}' not found", groups=groups)
     group = groups[0]
     result['group'] = group
 
     # Get current mappings
-    current_mappings = module.api.get(f"/admin/realms/{ realm }/groups/{ group['id']}/role-mappings")
+    current_mappings = module.api.get(f"/groups/{ group['id']}/role-mappings")
     from copy import deepcopy
     new_mappings = deepcopy(current_mappings)
 
@@ -156,7 +152,7 @@ def main():
                 if 'clientMappings' not in new_mappings:
                     new_mappings['clientMappings'] = dict()
                 if role['client'] not in new_mappings['clientMappings']:
-                    clients = module.api.get(f"/admin/realms/{ realm }/clients")
+                    clients = module.api.get("/clients")
                     client = next(filter(lambda c: c['clientId'] == role['client'], clients), None)
                     if client is None:
                         module.fail_json(f"Client '{ role['client'] }' not found")
@@ -167,28 +163,28 @@ def main():
                     )
 
                 if role['role'] not in map(lambda m: m['name'], new_mappings['clientMappings'][role['client']]['mappings']):
-                    croles = module.api.get(f"/admin/realms/{ realm }/clients/{ client['id'] }/roles?search={ role['role'] }")
+                    croles = module.api.get(f"/clients/{ client['id'] }/roles?search={ role['role'] }")
                     crole = next(filter(lambda r: r['name'] == role['role'], croles), None)
                     if crole is None:
                         module.fail_json(f"Role '{ role['role'] }' in client '{ role['client'] }' not found")
                     new_mappings['clientMappings'][role['client']]['mappings'].append(crole)
 
                     if not module.check_mode:
-                        module.api.post(f"/admin/realms/{ realm }/groups/{ group['id'] }/role-mappings/clients/{ client['id'] }",
+                        module.api.post(f"/groups/{ group['id'] }/role-mappings/clients/{ client['id'] }",
                                         payload=[dict(id=crole['id'], name=crole['name'], description=crole['description'])])
             else:
                 if 'realmMappings' not in new_mappings:
                     new_mappings['realmMappings'] = list()
 
                 if role['role'] not in map(lambda m: m['name'], new_mappings['realmMappings']):
-                    rroles = module.api.get(f"/admin/realms/{ realm }/groups/{ group['id'] }/role-mappings/realm/available")
+                    rroles = module.api.get(f"/groups/{ group['id'] }/role-mappings/realm/available")
                     rrole = next(filter(lambda r: r['name'] == role['role'], rroles), None)
                     if rrole is None:
                         module.fail_json(f"Role '{ role['role'] }' in realm '{ realm }' not found")
                     new_mappings['realmMappings'].append(rrole)
 
                     if not module.check_mode:
-                        module.api.post(f"/admin/realms/{ realm }/groups/{ group['id'] }/role-mappings/realm", payload=[rrole])
+                        module.api.post(f"/groups/{ group['id'] }/role-mappings/realm", payload=[rrole])
 
     if state == 'absent':
         for role in roles:
@@ -204,7 +200,7 @@ def main():
                     new_mappings['clientMappings'][role['client']]['mappings'].remove(crole)
 
                     if not module.check_mode:
-                        module.api.delete(f"/admin/realms/{ realm }/groups/{ group['id'] }/role-mappings/clients/{ client['id'] }",
+                        module.api.delete(f"/groups/{ group['id'] }/role-mappings/clients/{ client['id'] }",
                                           payload=[dict(id=crole['id'], name=crole['name'])])
             else:
                 if 'realmMappings' not in new_mappings:
@@ -215,7 +211,7 @@ def main():
                     new_mappings['realmMappings'].remove(rrole)
 
                     if not module.check_mode:
-                        module.api.delete(f"/admin/realms/{ realm }/groups/{ group['id'] }/role-mappings/realm",
+                        module.api.delete(f"/groups/{ group['id'] }/role-mappings/realm",
                                           payload=[dict(id=rrole['id'], name=rrole['name'])])
 
     if state == 'pure':
@@ -226,7 +222,7 @@ def main():
 
                     if not module.check_mode:
                         client_id = current_mappings['clientMappings'][client]['id']
-                        module.api.delete(f"/admin/realms/{ realm }/groups/{ group['id'] }/role-mappings/clients/{ client_id }",
+                        module.api.delete(f"/groups/{ group['id'] }/role-mappings/clients/{ client_id }",
                                           payload=[dict(id=crole['id'], name=crole['name'])])
 
         for rrole in current_mappings.get('realmMappings', []):
@@ -236,7 +232,7 @@ def main():
                     new_mappings['realmMappings'].remove(rrole)
 
                     if not module.check_mode:
-                        module.api.delete(f"/admin/realms/{ realm }/groups/{ group['id'] }/role-mappings/realm",
+                        module.api.delete(f"/groups/{ group['id'] }/role-mappings/realm",
                                           payload=[dict(id=rrole['id'], name=rrole['name'])])
 
     if current_mappings != new_mappings:

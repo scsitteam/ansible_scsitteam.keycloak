@@ -19,9 +19,6 @@ description:
       to your needs and a user having the expected roles.
 
 options:
-    realm:
-        description: Realm to operate on. Default to the auth_realm option.
-        type: str
     type:
         description:
             - OTP Type, time or counter based OTP.
@@ -103,7 +100,6 @@ def main():
     :return:
     """
     argument_spec = dict(
-        realm=dict(type='str'),
         type=dict(type='str', choices=['totp', 'hotp']),
         algorithm=dict(type='str', choices=['HmacSHA1', 'HmacSHA256', 'HmacSHA512'], aliases=['algo', 'hash']),
         digits=dict(type='int', choices=[6, 8]),
@@ -126,7 +122,7 @@ def main():
     realm = module.params.get('realm', module.params.get('auth_realm'))
 
     # Get current otp policy
-    data = module.api.get(f"/admin/realms/{ realm }")
+    data = module.api.get("/")
     current_otp_policy = {k: v for k, v in data.items() if k.startswith('otpPolicy')}
 
     # Build new otp policy
@@ -154,7 +150,7 @@ def main():
         result['diff'] = dict(before=current_otp_policy, after=new_opt_policy)
 
     if not module.check_mode:
-        module.api.put(f"/admin/realms/{ realm }", payload=new_opt_policy)
+        module.api.put("/", payload=new_opt_policy)
 
     module.exit_json(otp_policy=new_opt_policy, **result)
 
