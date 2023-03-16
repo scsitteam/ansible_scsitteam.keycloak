@@ -6,8 +6,8 @@
   name: Create new flow (check_mode)
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: test-flow
     description: Test Flow
     type: basic
@@ -40,8 +40,8 @@
   name: Create new flow (check_mode)
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: test-flow
     description: Test Flow New
   check_mode: true
@@ -66,8 +66,8 @@
   name: Set Executions 1 (check_mode)
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: test-flow
     executions:
       - authenticator: identity-provider-redirector
@@ -94,8 +94,8 @@
   name: Set Executions 2 (check_mode)
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: test-flow
     executions:
       - authenticator: auth-cookie
@@ -143,8 +143,8 @@
   name: Set Executions 3 (check_mode)
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: test-flow
     executions:
       - name: test-flow 3 registration form
@@ -182,8 +182,8 @@
   name: Bind Flow to resetCredentials (check_mode)
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: test-flow
     bind: resetCredentials
   check_mode: true
@@ -207,8 +207,8 @@
 - name: Bind 'reset credentials' Flow to resetCredentials
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: reset credentials
     bind: resetCredentials
   register: result
@@ -218,8 +218,8 @@
   name: Delete Flow (check_mode)
   authentication_flow:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     name: test-flow
     state: absent
   check_mode: true

@@ -6,8 +6,8 @@
 - name: Require at lease one digit (check_mode)
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: present
     policy:
       digits: 1
@@ -22,8 +22,8 @@
 - name: Require at lease one digit
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: present
     policy:
       digits: 1
@@ -37,8 +37,8 @@
 - name: Require at lease one digit (again)
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: present
     policy:
       digits: 1
@@ -52,8 +52,8 @@
 - name: Require at lease two digit
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: present
     policy:
       digits: 2
@@ -67,8 +67,8 @@
 - name: Remove policy named alice
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: absent
     policy:
       alice: bob
@@ -82,8 +82,8 @@
 - name: Remove policy named digits
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: absent
     policy:
       digits: 2
@@ -97,8 +97,8 @@
 - name: Remove policy named digits (again)
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: absent
     policy:
       digits: 2
@@ -112,8 +112,8 @@
 - name: Set complete Policy
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: pure
     policy:
       digits: 1
@@ -129,8 +129,8 @@
 - name: Set complete Policy (again)
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: pure
     policy:
       digits: 1
@@ -146,8 +146,8 @@
 - name: Set different Policy
   authentication_password_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: admin
     state: pure
     policy:
       digits: 1

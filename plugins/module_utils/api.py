@@ -86,13 +86,13 @@ class KeycloakApi(object):
 
         payload = {
             'grant_type': 'password',
-            'client_id': self.module.params.get('keycloak_client_id'),
-            'username': self.module.params.get('keycloak_username'),
-            'password': self.module.params.get('keycloak_password'),
+            'client_id': self.module.params.get('auth_client_id'),
+            'username': self.module.params.get('auth_username'),
+            'password': self.module.params.get('auth_password'),
         }
 
         try:
-            token_url = f"{self.module.params['keycloak_url']}/realms/{self.module.params['keycloak_realm']}/protocol/openid-connect/token"
+            token_url = f"{self.module.params['keycloak_url']}/realms/{self.module.params['auth_realm']}/protocol/openid-connect/token"
             data = json.loads(cli.post(token_url, data=urlencode(payload)).read())
         except HTTPError as e:
             data = json.loads(e.read())

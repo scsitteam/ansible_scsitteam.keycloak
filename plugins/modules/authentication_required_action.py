@@ -20,7 +20,7 @@ description:
 
 options:
     realm:
-        description: Realm to operate on. Default to the keycloak_realm option.
+        description: Realm to operate on. Default to the auth_realm option.
         type: str
     name:
         description: Name of the required action to manage
@@ -106,7 +106,7 @@ def main():
 
     result = dict(changed=False)
 
-    realm = module.params.get('realm', module.params.get('keycloak_realm'))
+    realm = module.params.get('realm', module.params.get('auth_realm'))
 
     name = module.params.get('name')
     priority = module.params.get('priority')

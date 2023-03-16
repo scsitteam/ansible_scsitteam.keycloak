@@ -18,13 +18,13 @@ from functools import cached_property
 class AnsibleKeycloakModule(AnsibleModule):
     def __init__(self, argument_spec, **kwargs):
         argument_spec.update(dict(
-            keycloak_url=dict(type='str', required=True, no_log=False),
-            keycloak_client_id=dict(type='str', default='admin-cli'),
-            keycloak_realm=dict(type='str', default='master', no_log=False),
-            keycloak_client_secret=dict(type='str', default=None, no_log=True),
-            keycloak_username=dict(type='str', no_log=False),
-            keycloak_password=dict(type='str', no_log=True),
-            keycloak_token=dict(type='str', no_log=True),
+            keycloak_url=dict(type='str', required=True, no_log=False, aliases=['keycloak_auth_url']),
+            auth_client_id=dict(type='str', default='admin-cli', aliases=['keycloak_client_id']),
+            auth_realm=dict(type='str', default='master', no_log=False, aliases=['keycloak_realm']),
+            auth_client_secret=dict(type='str', default=None, no_log=True, aliases=['keycloak_client_secret']),
+            auth_username=dict(type='str', no_log=False, aliases=['keycloak_username']),
+            auth_password=dict(type='str', no_log=True, aliases=['keycloak_password']),
+            keycloak_auth_token=dict(type='str', no_log=True, aliases=['keycloak_token']),
             validate_certs=dict(type='bool', default=True),
             connection_timeout=dict(type='int', default=10),
         ))
