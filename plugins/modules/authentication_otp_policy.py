@@ -119,10 +119,10 @@ def main():
 
     result = dict(changed=False)
 
-    keycloak_realm = module.params.get('keycloak_realm')
+    realm = module.params.get('realm', module.params.get('auth_realm'))
 
     # Get current otp policy
-    data = module.api.get(f"/admin/realms/{ keycloak_realm }")
+    data = module.api.get("/")
     current_otp_policy = {k: v for k, v in data.items() if k.startswith('otpPolicy')}
 
     # Build new otp policy
@@ -150,7 +150,7 @@ def main():
         result['diff'] = dict(before=current_otp_policy, after=new_opt_policy)
 
     if not module.check_mode:
-        module.api.put(f"/admin/realms/{ keycloak_realm }", payload=new_opt_policy)
+        module.api.put("/", payload=new_opt_policy)
 
     module.exit_json(otp_policy=new_opt_policy, **result)
 

@@ -17,39 +17,50 @@ options:
         description:
             - URL to the Keycloak instance.
         type: str
+        aliases: [ keycloak_auth_url ]
         required: true
 
-    keycloak_client_id:
+    realm:
+        description: Realm to operate on. Default to the auth_realm option.
+        type: str
+
+    auth_client_id:
         description:
             - OpenID Connect I(client_id) to authenticate to the API with.
         type: str
+        aliases: [ keycloak_client_id ]
         default: admin-cli
 
-    keycloak_realm:
+    auth_realm:
         description:
             - Keycloak realm name to authenticate to for API access.
         type: str
+        aliases: [ keycloak_realm ]
         default: master
 
-    keycloak_client_secret:
+    auth_client_secret:
         description:
-            - Client Secret to use in conjunction with I(keycloak_client_id) (if required).
+            - Client Secret to use in conjunction with I(auth_client_id) (if required).
         type: str
+        aliases: [ keycloak_client_secret ]
 
-    keycloak_username:
+    auth_username:
         description:
             - Username to authenticate for API access with.
         type: str
+        aliases: [ keycloak_username ]
 
-    keycloak_password:
+    auth_password:
         description:
             - Password to authenticate for API access with.
         type: str
+        aliases: [ keycloak_password ]
 
-    keycloak_token:
+    auth_token:
         description:
             - Authentication token for Keycloak API.
         type: str
+        aliases: [ keycloak_token ]
 
     validate_certs:
         description:

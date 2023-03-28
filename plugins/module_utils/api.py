@@ -20,7 +20,7 @@ class KeycloakApi(object):
         self.module = module
 
     def get(self, url):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             return json.loads(self._cli.get(url).read())
         except HTTPError as e:
@@ -32,7 +32,7 @@ class KeycloakApi(object):
             self.module.fail_json(f"Could not get {url}: {str(e)}")
 
     def post(self, url, payload):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             data = self._cli.post(url, data=json.dumps(payload)).read()
             if data:
@@ -47,7 +47,7 @@ class KeycloakApi(object):
             self.module.fail_json(f"Could not post {url}: {str(e)}")
 
     def put(self, url, payload):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             data = self._cli.put(url, data=json.dumps(payload)).read()
             if data:
@@ -62,7 +62,7 @@ class KeycloakApi(object):
             self.module.fail_json(f"Could not put {url}: {str(e)}")
 
     def delete(self, url):
-        url = f"{self.module.params['keycloak_url']}/{ url }"
+        url = f"{self.module.params['keycloak_url']}/admin/realms/{self.module.realm}/{ url.lstrip('/') }"
         try:
             data = self._cli.delete(url).read()
             if data:
@@ -86,13 +86,13 @@ class KeycloakApi(object):
 
         payload = {
             'grant_type': 'password',
-            'client_id': self.module.params.get('keycloak_client_id'),
-            'username': self.module.params.get('keycloak_username'),
-            'password': self.module.params.get('keycloak_password'),
+            'client_id': self.module.params.get('auth_client_id'),
+            'username': self.module.params.get('auth_username'),
+            'password': self.module.params.get('auth_password'),
         }
 
         try:
-            token_url = f"{self.module.params['keycloak_url']}/realms/{self.module.params['keycloak_realm']}/protocol/openid-connect/token"
+            token_url = f"{self.module.params['keycloak_url']}/realms/{self.module.params['auth_realm']}/protocol/openid-connect/token"
             data = json.loads(cli.post(token_url, data=urlencode(payload)).read())
         except HTTPError as e:
             data = json.loads(e.read())

@@ -5,16 +5,16 @@
 - name: Reset to 6 Digit TOTP
   authentication_otp_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: password
     type: totp
     digits: 6
 
 - name: Set to 8 Digit Counter OTP (check_mode)
   authentication_otp_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: password
     type: hotp
     digits: 8
   check_mode: true
@@ -28,8 +28,8 @@
 - name: Set to 8 Digit Counter OTP
   authentication_otp_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: password
     type: hotp
     digits: 8
   register: result_0002
@@ -42,8 +42,8 @@
 - name: Set to 8 Digit Counter OTP (again)
   authentication_otp_policy:
     keycloak_url: '{{ keycloak_url }}'
-    keycloak_username: admin
-    keycloak_password: admin
+    auth_username: admin
+    auth_password: password
     type: hotp
     digits: 8
   register: result_0003

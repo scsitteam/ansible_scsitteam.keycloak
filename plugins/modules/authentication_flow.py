@@ -197,7 +197,6 @@ def main():
 
     executions = executions_to_keycloak(module)
 
-    keycloak_realm = module.params.get('keycloak_realm')
     state = module.params.get('state')
     id = module.params.get('id')
     name = module.params.get('name')
@@ -206,7 +205,7 @@ def main():
     bind = module.params.get('bind')
 
     # Get current flow
-    data = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/flows")
+    data = module.api.get("/authentication/flows")
     if id:
         current_flow = next(filter(lambda f: f['id'] == id, data), None)
         if current_flow is None:
@@ -231,9 +230,9 @@ def main():
             topLevel=True,
         )
         if not module.check_mode:
-            module.api.post(f"/admin/realms/{ keycloak_realm }/authentication/flows", payload=new_flow)
+            module.api.post("/authentication/flows", payload=new_flow)
 
-            data = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/flows")
+            data = module.api.get("authentication/flows")
             new_flow = next(filter(lambda f: f['alias'] == name, data), None)
             del new_flow['authenticationExecutions']
 
@@ -253,7 +252,7 @@ def main():
                 result['diff']['after']['flow'] = None
 
             if not module.check_mode:
-                module.api.delete(f"/admin/realms/{ keycloak_realm }/authentication/flows/{current_flow['id']}")
+                module.api.delete(f"/authentication/flows/{current_flow['id']}")
         module.exit_json(**result)
 
     if current_flow != new_flow:
@@ -263,18 +262,18 @@ def main():
             result['diff']['after']['flow'] = new_flow
 
         if not module.check_mode:
-            module.api.put(f"/admin/realms/{ keycloak_realm }/authentication/flows/{new_flow['id']}", payload=new_flow)
+            module.api.put(f"/authentication/flows/{new_flow['id']}", payload=new_flow)
 
     if bind is not None:
         # Get current password policy
-        data = module.api.get(f"/admin/realms/{ keycloak_realm }")
+        data = module.api.get("/")
         current_bind = next((k[:-4] for k, v in data.items() if v == name), None)
         if current_bind != bind:
             if current_bind is not None:
                 module.fail_json(msg=f"Flow '{name}' is already bound as {current_bind}")
 
             if not module.check_mode:
-                module.api.put(f"/admin/realms/{ keycloak_realm }/", payload={f"{bind}Flow": name})
+                module.api.put("/", payload={f"{bind}Flow": name})
 
             result['changed'] = True
             if module._diff:
@@ -283,7 +282,7 @@ def main():
 
     # Update executions
     if state == 'present' and executions is not None:
-        current_executions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ name }/executions")
+        current_executions = module.api.get(f"/authentication/flows/{ name }/executions")
 
         new_executions = current_executions.copy()
 
@@ -299,8 +298,8 @@ def main():
             if current_execution and current_execution['level'] > execution['level']:
                 result['changed'] = True
                 if not module.check_mode:
-                    module.api.delete(f"/admin/realms/{ keycloak_realm }/authentication/executions/{new_executions[idx]['id']}")
-                    new_executions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ quote(name) }/executions")
+                    module.api.delete(f"/authentication/executions/{new_executions[idx]['id']}")
+                    new_executions = module.api.get(f"/authentication/flows/{ quote(name) }/executions")
                 else:
                     del new_executions[idx]
                 continue
@@ -314,9 +313,9 @@ def main():
                 if not module.check_mode:
                     payload = dict(provider=execution.get('authenticator'))
                     flow_name_url = quote(execution.get('flow_name', name))
-                    module.api.post(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ flow_name_url }/executions/execution", payload=payload)
+                    module.api.post(f"/authentication/flows/{ flow_name_url }/executions/execution", payload=payload)
 
-                    new_executions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ flow_name_url }/executions")
+                    new_executions = module.api.get(f"/authentication/flows/{ flow_name_url }/executions")
                     current_execution = new_executions[-1]
                 else:
                     new_executions.insert(idx, execution)
@@ -337,9 +336,9 @@ def main():
                         type=f"{execution.get('type', 'basic')}-flow",
                     )
                     flow_name_url = quote(execution.get('flow_name', name))
-                    module.api.post(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ flow_name_url  }/executions/flow", payload=payload)
+                    module.api.post(f"/authentication/flows/{ flow_name_url  }/executions/flow", payload=payload)
 
-                    new_executions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ flow_name_url }/executions")
+                    new_executions = module.api.get(f"/authentication/flows/{ flow_name_url }/executions")
                     current_execution = new_executions[-1]
                 else:
                     new_executions.insert(idx, execution)
@@ -347,7 +346,7 @@ def main():
 
             if not module.check_mode and current_execution['index'] > execution['index']:
                 for i in range(execution['index'], current_execution['index']):
-                    module.api.post(f"/admin/realms/{ keycloak_realm }/authentication/executions/{current_execution['id']}/raise-priority", payload=None)
+                    module.api.post(f"/authentication/executions/{current_execution['id']}/raise-priority", payload=None)
 
             if current_execution.get('providerId', None) == execution.get('authenticator', None):
                 new_execution = current_execution.copy()
@@ -359,11 +358,11 @@ def main():
                 if current_execution != new_execution:
                     result['changed'] = True
                     if not module.check_mode:
-                        module.api.put(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ name }/executions", payload=new_execution)
+                        module.api.put(f"/authentication/flows/{ name }/executions", payload=new_execution)
                     else:
                         new_executions[idx] = new_execution
             if not module.check_mode:
-                new_executions = module.api.get(f"/admin/realms/{ keycloak_realm }/authentication/flows/{ name }/executions")
+                new_executions = module.api.get(f"/authentication/flows/{ name }/executions")
 
             idx += 1
 
@@ -371,7 +370,7 @@ def main():
         while len(new_executions) > len(executions):
             result['changed'] = True
             if not module.check_mode:
-                module.api.delete(f"/admin/realms/{ keycloak_realm }/authentication/executions/{new_executions[-1]['id']}")
+                module.api.delete(f"/authentication/executions/{new_executions[-1]['id']}")
             del new_executions[-1]
 
         if current_executions != new_executions:
