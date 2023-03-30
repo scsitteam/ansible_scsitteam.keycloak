@@ -17,7 +17,7 @@ options:
         description:
             - URL to the Keycloak instance.
         type: str
-        aliases: [ keycloak_auth_url ]
+        aliases: [ auth_keycloak_url ]
         required: true
 
     realm:
