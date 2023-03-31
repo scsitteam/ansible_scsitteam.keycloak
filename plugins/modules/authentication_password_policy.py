@@ -143,9 +143,9 @@ def main():
             notUsername=dict(type='bool'),
             hashAlgorithm=dict(type='str'),
             hashIterations=dict(type='int'),
-            passwordHistory=dict(type='int'),
-            forceExpiredPasswordChange=dict(type='int'),
-            passwordBlacklist=dict(type='str'),
+            passwordHistory=dict(type='int', no_log=False),
+            forceExpiredPasswordChange=dict(type='int', no_log=False),
+            passwordBlacklist=dict(type='str', no_log=False),
         )),
         state=dict(type='str', default='present', choices=['present', 'absent', 'pure']),
     )
