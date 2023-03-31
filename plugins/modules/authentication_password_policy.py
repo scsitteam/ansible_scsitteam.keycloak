@@ -157,7 +157,7 @@ def main():
     result = dict(changed=False)
 
     realm = module.params.get('realm', module.params.get('auth_realm'))
-    policy = {k: str(v) for k, v in module.params.get('policy').items()}
+    policy = {k: str(v) for k, v in module.params.get('policy').items() if v is not None}
     for key in bool_values:
         if not policy.get(key, True):
             del policy[key]
