@@ -18,7 +18,7 @@ from functools import cached_property
 class AnsibleKeycloakModule(AnsibleModule):
     def __init__(self, argument_spec, **kwargs):
         argument_spec.update(dict(
-            keycloak_url=dict(type='str', required=True, no_log=False, aliases=['keycloak_auth_url']),
+            keycloak_url=dict(type='str', required=True, no_log=False, aliases=['auth_keycloak_url']),
             realm=dict(type='str'),
             auth_client_id=dict(type='str', default='admin-cli', aliases=['keycloak_client_id']),
             auth_realm=dict(type='str', default='master', no_log=False, aliases=['keycloak_realm']),

@@ -22,10 +22,51 @@ options:
     policy:
         description:
             - Policies to manage as a dictionary with the policy name as keys and the policy config as value.
-            - Known policies are C(length), C(maxLength), C(lowerCase), C(upperCase), C(specialChars), C(digits),
-              C(regexPattern), C(notEmail), C(notUsername), C(hashAlgorithm), C(hashIterations), C(passwordHistory),
-              or C(forceExpiredPasswordChange)
         type: dict
+        suboptions:
+            length:
+                description: Minimal password length.
+                type: int
+            maxLength:
+                description: Maximal password length.
+                type: int
+            lowerCase:
+                description: Minimal number of lower case letters.
+                type: int
+            upperCase:
+                description: Minimal number of upper case letters.
+                type: int
+            specialChars:
+                description: Minimal number of special characters.
+                type: int
+            digits:
+                description: Minimal number of digits.
+                type: int
+            regexPattern:
+                description: Regexpattern the password must match.
+                type: str
+            notEmail:
+                description: If the email address can not be used in the password.
+                type: bool
+            notUsername:
+                description: If the username can not be used in the password.
+                type: bool
+            hashAlgorithm:
+                description: Hash algorithm to use for hashing.
+                type: str
+            hashIterations:
+                description: Number of hash interations to apply.
+                type: int
+            passwordHistory:
+                description: Prevents a recently used password from being reused. How many to remember.
+                type: int
+            forceExpiredPasswordChange:
+                description: The number of days the password is valid before a new password is required
+                type: int
+            passwordBlacklist:
+                description: Prevents the use of a password that is in a blacklist file.
+                type: str
+
     state:
         description:
             - State of the password policy
@@ -90,9 +131,25 @@ def main():
     :return:
     """
     argument_spec = dict(
-        policy=dict(type='dict'),
+        policy=dict(type='dict', default={}, options=dict(
+            length=dict(type='int'),
+            maxLength=dict(type='int'),
+            lowerCase=dict(type='int'),
+            upperCase=dict(type='int'),
+            specialChars=dict(type='int'),
+            digits=dict(type='int'),
+            regexPattern=dict(type='str'),
+            notEmail=dict(type='bool'),
+            notUsername=dict(type='bool'),
+            hashAlgorithm=dict(type='str'),
+            hashIterations=dict(type='int'),
+            passwordHistory=dict(type='int', no_log=False),
+            forceExpiredPasswordChange=dict(type='int', no_log=False),
+            passwordBlacklist=dict(type='str', no_log=False),
+        )),
         state=dict(type='str', default='present', choices=['present', 'absent', 'pure']),
     )
+    bool_values = ['notEmail', 'notUsername']
 
     module = AnsibleKeycloakModule(argument_spec=argument_spec,
                                    supports_check_mode=True)
@@ -101,11 +158,17 @@ def main():
 
     realm = module.params.get('realm', module.params.get('auth_realm'))
     policy = {k: str(v) for k, v in module.params.get('policy').items()}
+    for key in bool_values:
+        if not policy.get(key, True):
+            del policy[key]
     state = module.params.get('state')
 
     # Get current password policy
     data = module.api.get("/")
     current_password_policy = dict(p[:-1].split('(', 1) for p in data.get('passwordPolicy', '').split(' and ') if p)
+    for key in bool_values:
+        if key in current_password_policy:
+            current_password_policy[key] = True
 
     new_password_policy = current_password_policy.copy()
 
